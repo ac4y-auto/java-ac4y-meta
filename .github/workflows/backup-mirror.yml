@@ -1,0 +1,25 @@
+name: Backup to ac4y-safe
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Mirror to ac4y-safe organization
+        env:
+          BACKUP_TOKEN: ${{ secrets.BACKUP_TOKEN }}
+        run: |
+          REPO_NAME=$(basename $GITHUB_REPOSITORY)
+          git remote add backup https://x-access-token:${BACKUP_TOKEN}@github.com/ac4y-safe/${REPO_NAME}.git
+          git push backup --all --force
+          git push backup --tags --force
